@@ -8,4 +8,3 @@
  
 $lang['cite_publisher'] = 'Publisher name (default is Wiki Title)';
 $lang['cite_author'] = 'Author name for pages (default is "Anonymous Contributors")';
-
