@@ -5,63 +5,61 @@
  */
 
 // must be run within Dokuwiki
-if(!defined('DOKU_INC')) die();
+if (!defined('DOKU_INC')) {
+    die();
+}
 
-if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
+if (!defined('DOKU_PLUGIN')) {
+    define('DOKU_PLUGIN', DOKU_INC.'lib/plugins/');
+}
 require_once(DOKU_PLUGIN.'action.php');
 include_once(DOKU_PLUGIN.'cite/code.php');
 
-class action_plugin_cite extends DokuWiki_Action_Plugin {
-
-    /**
-     * return some info
-     */
-    function getInfo() {
-        return array(
-                'author' => 'Terence J. Grant',
-                'email'  => 'tjgrant@tatewake.com',
-                'date'   => '2009-05-28',
-                'name'   => 'Citation Plugin',
-                'desc'   => 'Creates a citation page when you add ?do=cite to a page URL.',
-                'url'    => 'http://tjgrant.com/wiki/software:dokuwiki:plugin:cite',
-                );
-    }
-
+class action_plugin_cite extends DokuWiki_Action_Plugin
+{
     /**
      * register the eventhandlers
      */
-    function register(Doku_Event_Handler $contr) {
+    public function register(Doku_Event_Handler $contr)
+    {
         $contr->register_hook('ACTION_ACT_PREPROCESS', 'BEFORE', $this, '_handle_act', array());
         $contr->register_hook('TPL_ACT_UNKNOWN', 'BEFORE', $this, '_handle_tpl_act', array());
     }
 
-    function _handle_act(&$event, $param) {
-        if($event->data != 'cite') return;
+    public function _handle_act(&$event, $param)
+    {
+        if ($event->data != 'cite') {
+            return;
+        }
         $event->preventDefault();
     }
 
-    function _handle_tpl_act(&$event, $param)
+    public function _handle_tpl_act(&$event, $param)
     {
-			if($event->data != 'cite') return;
-			$event->preventDefault();
+        if ($event->data != 'cite') {
+            return;
+        }
+        $event->preventDefault();
 
-			global $INFO, $conf, $ID;
+        global $INFO, $conf, $ID;
 
-			$cite_perm = cite_getPermURL();
-			$cite_author = $this->getConf('cite_author');
-			$cite_publisher = $this->getConf('cite_publisher');
+        $cite_perm = cite_getPermURL();
+        $cite_author = $this->getConf('cite_author');
+        $cite_publisher = $this->getConf('cite_publisher');
 
-			if ($cite_author == '') $cite_author = 'Anonymous Contributors';
-			if ($cite_publisher == '') $cite_publisher = hsc($conf['title']);
-
-		?>
+        if ($cite_author == '') {
+            $cite_author = 'Anonymous Contributors';
+        }
+        if ($cite_publisher == '') {
+            $cite_publisher = hsc($conf['title']);
+        } ?>
 <h1><a name="bibliographic_details" id="bibliographic_details">Bibliographic details for &quot;<?php tpl_pagetitle()?>&quot;</a></h2>
 <div class="level2">
 
 <ul>
 <li class="level1"><div class="li"> Page name: <?php tpl_pagetitle()?></div>
 </li>
-<li class="level1"><div class="li"> Author: <?php echo $cite_author;?></div>
+<li class="level1"><div class="li"> Author: <?php echo $cite_author; ?></div>
 </li>
 <li class="level1"><div class="li"> Publisher: <?php echo $cite_publisher?>.</div>
 </li>
@@ -90,7 +88,7 @@ class action_plugin_cite extends DokuWiki_Action_Plugin {
 <div class="level3">
 
 <p>
- <?php echo $cite_author;?> (<?php echo date('Y', $_REQUEST['rev']); ?>). <?php tpl_pagetitle()?>. <?php echo $cite_publisher?>. Retrieved <?php echo date('H:i, j F, Y'); ?> from <a href="<?php echo $cite_perm; ?>" title="<?php echo $cite_perm; ?>"><?php echo $cite_perm; ?></a>.
+ <?php echo $cite_author; ?> (<?php echo date('Y', $_REQUEST['rev']); ?>). <?php tpl_pagetitle()?>. <?php echo $cite_publisher?>. Retrieved <?php echo date('H:i, j F, Y'); ?> from <a href="<?php echo $cite_perm; ?>" title="<?php echo $cite_perm; ?>"><?php echo $cite_perm; ?></a>.
 </p>
 
 </div>
@@ -107,7 +105,7 @@ class action_plugin_cite extends DokuWiki_Action_Plugin {
 <div class="level3">
 
 <p>
- <?php echo $cite_author;?>, &lsquo;<?php tpl_pagetitle()?>&rsquo;, <?php echo $cite_publisher?>, <?php echo date('j F Y, H:i T', $_REQUEST['rev']); ?>, &lt;<a href="<?php echo $cite_perm; ?>" title="<?php echo $cite_perm; ?>"><?php echo $cite_perm; ?></a>&gt; [accessed <?php echo date('j F Y'); ?>]
+ <?php echo $cite_author; ?>, &lsquo;<?php tpl_pagetitle()?>&rsquo;, <?php echo $cite_publisher?>, <?php echo date('j F Y, H:i T', $_REQUEST['rev']); ?>, &lt;<a href="<?php echo $cite_perm; ?>" title="<?php echo $cite_perm; ?>"><?php echo $cite_perm; ?></a>&gt; [accessed <?php echo date('j F Y'); ?>]
 </p>
 
 </div>
@@ -115,7 +113,7 @@ class action_plugin_cite extends DokuWiki_Action_Plugin {
 <div class="level3">
 
 <p>
- <?php echo $cite_author;?>, &ldquo;<?php tpl_pagetitle()?>,&rdquo; <?php echo $cite_publisher?>, <a href="<?php echo $cite_perm; ?>" title="<?php echo $cite_perm; ?>"><?php echo $cite_perm; ?></a> (accessed <?php echo date('F j, Y'); ?>).
+ <?php echo $cite_author; ?>, &ldquo;<?php tpl_pagetitle()?>,&rdquo; <?php echo $cite_publisher?>, <a href="<?php echo $cite_perm; ?>" title="<?php echo $cite_perm; ?>"><?php echo $cite_perm; ?></a> (accessed <?php echo date('F j, Y'); ?>).
 </p>
 
 </div>
@@ -124,7 +122,7 @@ class action_plugin_cite extends DokuWiki_Action_Plugin {
 <div class="level3">
 
 <p>
- <?php echo $cite_author;?>. <?php tpl_pagetitle()?> [Internet]. <?php echo $cite_publisher?>; <?php echo date('Y M j, H:i T', $_REQUEST['rev']); ?> [cited <?php echo date('Y M j'); ?>]. Available from: <a href="<?php echo $cite_perm; ?>" title="<?php echo $cite_perm; ?>"><?php echo $cite_perm; ?></a>.
+ <?php echo $cite_author; ?>. <?php tpl_pagetitle()?> [Internet]. <?php echo $cite_publisher?>; <?php echo date('Y M j, H:i T', $_REQUEST['rev']); ?> [cited <?php echo date('Y M j'); ?>]. Available from: <a href="<?php echo $cite_perm; ?>" title="<?php echo $cite_perm; ?>"><?php echo $cite_perm; ?></a>.
 </p>
 
 </div>
@@ -141,7 +139,7 @@ class action_plugin_cite extends DokuWiki_Action_Plugin {
 <div class="level3">
 
 <p>
- <?php echo $cite_author;?>. <?php tpl_pagetitle()?>. <?php echo $cite_publisher?>. <?php echo date('F j, Y, H:i T', $_REQUEST['rev']); ?>. Available at: <a href="<?php echo $cite_perm; ?>" title="<?php echo $cite_perm; ?>"><?php echo $cite_perm; ?></a>. Accessed <?php echo date('F j, Y'); ?>.
+ <?php echo $cite_author; ?>. <?php tpl_pagetitle()?>. <?php echo $cite_publisher?>. <?php echo date('F j, Y, H:i T', $_REQUEST['rev']); ?>. Available at: <a href="<?php echo $cite_perm; ?>" title="<?php echo $cite_perm; ?>"><?php echo $cite_perm; ?></a>. Accessed <?php echo date('F j, Y'); ?>.
 
 </p>
 
@@ -150,7 +148,7 @@ class action_plugin_cite extends DokuWiki_Action_Plugin {
 <div class="level3">
 <pre>
  @misc{ wiki:xxx,
-   author = &quot;<?php echo $cite_author;?>&quot;,
+   author = &quot;<?php echo $cite_author; ?>&quot;,
    title = &quot;<?php tpl_pagetitle()?> --- <?php echo $cite_publisher?>&quot;,
    year = &quot;<?php echo date('Y', $_REQUEST['rev']); ?>&quot;,
    url = &quot;<?php echo $cite_perm; ?>&quot;,
@@ -163,7 +161,7 @@ When using the LaTeX package url (\usepackage{url} somewhere in the preamble), w
 </p>
 <pre>
  @misc{ wiki:xxx,
-   author = &quot;<?php echo $cite_author;?>&quot;,
+   author = &quot;<?php echo $cite_author; ?>&quot;,
    title = &quot;<?php tpl_pagetitle()?> --- <?php echo $cite_publisher?>&quot;,
    year = &quot;<?php echo date('Y', $_REQUEST['rev']); ?>&quot;,
    url = &quot;\url{<?php echo $cite_perm; ?>}&quot;,
