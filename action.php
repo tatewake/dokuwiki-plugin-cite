@@ -4,29 +4,23 @@
  * @author     Terence J. Grant <tjgrant@tatewake.com>
  */
 
-// must be run within Dokuwiki
-if (!defined('DOKU_INC')) {
-    die();
-}
-
-if (!defined('DOKU_PLUGIN')) {
-    define('DOKU_PLUGIN', DOKU_INC.'lib/plugins/');
-}
-require_once(DOKU_PLUGIN.'action.php');
-include_once(DOKU_PLUGIN.'cite/code.php');
+include_once(DOKU_PLUGIN . 'cite/code.php'); //this ensures the functions in code.php are always available
 
 class action_plugin_cite extends DokuWiki_Action_Plugin
 {
     /**
      * register the eventhandlers
+     *
+     * @param Doku_Event_Handler $controller
      */
-    public function register(Doku_Event_Handler $contr)
+    public function register(Doku_Event_Handler $controller)
     {
-        $contr->register_hook('ACTION_ACT_PREPROCESS', 'BEFORE', $this, '_handle_act', array());
-        $contr->register_hook('TPL_ACT_UNKNOWN', 'BEFORE', $this, '_handle_tpl_act', array());
+        $controller->register_hook('ACTION_ACT_PREPROCESS', 'BEFORE', $this, '_handle_act', array());
+        $controller->register_hook('TPL_ACT_UNKNOWN', 'BEFORE', $this, '_handle_tpl_act', array());
+
     }
 
-    public function _handle_act(&$event, $param)
+    public function _handle_act($event, $param)
     {
         if ($event->data != 'cite') {
             return;
@@ -34,7 +28,7 @@ class action_plugin_cite extends DokuWiki_Action_Plugin
         $event->preventDefault();
     }
 
-    public function _handle_tpl_act(&$event, $param)
+    public function _handle_tpl_act($event, $param)
     {
         if ($event->data != 'cite') {
             return;
