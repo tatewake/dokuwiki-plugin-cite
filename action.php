@@ -17,6 +17,7 @@ class action_plugin_cite extends DokuWiki_Action_Plugin
     {
         $controller->register_hook('ACTION_ACT_PREPROCESS', 'BEFORE', $this, '_handle_act', array());
         $controller->register_hook('TPL_ACT_UNKNOWN', 'BEFORE', $this, '_handle_tpl_act', array());
+        $controller->register_hook('MENU_ITEMS_ASSEMBLY', 'AFTER', $this, 'addsvgbutton', array());
 
     }
 
@@ -165,5 +166,24 @@ When using the LaTeX package url (\usepackage{url} somewhere in the preamble), w
 
 </div>
 <?php
+    }
+
+    /**
+     * Add 'cite' button to page tools, new SVG based mechanism
+     *
+     * @param Doku_Event $event
+     */
+    public function addsvgbutton(Doku_Event $event)
+    {
+        global $INFO;
+        if ($event->data['view'] != 'page' || !$this->getConf('showcitebutton')) {
+            return;
+        }
+
+        if (!$INFO['exists']) {
+            return;
+        }
+
+        array_splice($event->data['items'], -1, 0, [new \dokuwiki\plugin\cite\MenuItem()]);
     }
 }
