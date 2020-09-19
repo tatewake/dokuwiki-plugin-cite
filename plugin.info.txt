@@ -1,7 +1,7 @@
 base        cite
 author      Terence J. Grant
 email       tjgrant@tatewake.com
-date        2020-09-14
-name        Citations for DokuWiki 1.0.0
+date        2020-09-19
+name        Citations for DokuWiki
 desc        This plugin gives you the ability to let users cite your work.
 url         https://www.dokuwiki.org/plugin:cite
