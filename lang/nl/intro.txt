@@ -1,0 +1,44 @@
+====== Citaties voor DokuWiki ======
+
+===== Over =====
+
+Deze plugin geeft je de mogelijkheid om gebruikers jouw werk te laten citeren. Dit is vaak noodzakelijk in voor in
+academisch en journalistiek werk.
+
+De manier om de pagina met de verschillende citatiestijlen te laten zien is door ''&do=cite'' toe te voegen aan de
+pagina-url eventueel aangevuld met een revisie nummer, bijvoorbeeld ''rev=123456789''.
+
+Recente templates kunnen de knop naar de citaties automatische toevoegen aan hun menu. In de configuratiebeheerder
+kun je de knop weer uitzetten. Anders zul je zelf code aan de **main.php** van je template moeten toevoegen voordat de
+link of knop zal verschijnen!
+
+===== Setup indien nog niet ondersteund =====
+
+Om een permanente link of een link naar de citaties toe te voegen in je document, gebruik je de volgende voorbeeld code:
+<code php>
+<?php if (function_exists('cite_getPermURL')) { ?><a href="<?php echo cite_getPermURL(); ?>" rel="nofollow">Permanent Link</a><?php } ?>
+<?php if (function_exists('cite_getCiteURL')) { ?><a href="<?php echo cite_getCiteURL(); ?>" rel="nofollow">Cite this Page</a><?php } ?>
+</code>
+
+Mijn advies is om de ''%%rel="nofollow"%%'' intact te laten om te garanderen dat de zoekmachines die citaties indexeren.
+
+De instellingen van deze plugin kun je aanpassen in de **Configuratiebeheerder** via de DokuWiki beheermenu.
+
+
+===== Voor template-ontwikkelaar =====
+====Huidige menu's====
+Als je [[https://www.dokuwiki.org/devel:menus]] gebruikt wordt de knop naar de citatiespagina automatisch toegevoegd.
+De menu iconen zijn svg-gebaseerd, dus de kleur van de iconen kan aan gepast worden aan de stijl van de template.
+
+====Oude menu's====
+De plugin heeft ook twee functies beschikbaar:
+  * **cite_getPermURL()** : Een //permanente link// naar een specifieke paginarevisie
+  * **cite_getCiteURL()** : Een //citatie link// dus daarmee kun jij anderen de citaties makkelijk laten vinden
+
+
+===== Ondersteuning =====
+
+Voor verdere ondersteuning of discussie, zie de officiële [[doku>plugin:cite|plugin]] pagina.
+
+Als je deze plugin nuttig vind, overweeg dan het project te steunen via [[http://tjgrant.com/wiki/donate|Donations]]
+of [[https://github.com/sponsors/tatewake|Sponsorships]]; bedankt!

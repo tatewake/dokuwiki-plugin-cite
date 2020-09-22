@@ -4,23 +4,41 @@
  * @author     Terence J. Grant <tjgrant@tatewake.com>
  */
 
-//Return a permanent URL to a page
+/**
+ * Return a permanent URL to a page
+ *
+ * @return string
+ * @deprecated 2020-09-19 If the template uses https://www.dokuwiki.org/devel:menus, the button to the cite page is added automatically
+ */
 function cite_getPermURL()
 {
-    global $INFO, $ID;
+    global $INFO, $ID, $REV;
 
     //get active revision
-    if (!isset($_REQUEST['rev'])) {
-        $_REQUEST['rev'] = $INFO['lastmod'];
+    $rev = $REV; //$REV includes converted DATE_AT as well
+    if (!$rev) {
+        $rev = $INFO['lastmod'];
     }
 
     //return a URL with that
-    return DOKU_URL.DOKU_SCRIPT.'?id='.$ID.'&amp;rev='.$_REQUEST['rev'];
+    return wl($ID, ['rev' => $rev], true);
 }
 
-//Return a URL to cite a page, based on the permanent URL
+/**
+ * Return a URL to cite a page, based on the permanent URL
+ *
+ * @return string
+ * @deprecated 2020-09-19 If the template uses https://www.dokuwiki.org/devel:menus, the button to the cite page is added automatically
+ */
 function cite_getCiteURL()
 {
+    global $INFO, $ID, $REV;
+    //get active revision
+    $rev = $REV; //$REV includes converted DATE_AT as well
+    if (!$rev) {
+        $rev = $INFO['lastmod'];
+    }
+
     //return a permanent link with citation
-    return cite_getPermURL().'&amp;do=cite';
+    return wl($ID, ['rev' => $rev, 'do' => 'cite'], true);
 }
