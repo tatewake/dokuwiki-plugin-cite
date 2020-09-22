@@ -4,29 +4,24 @@
  * @author     Terence J. Grant <tjgrant@tatewake.com>
  */
 
-// must be run within Dokuwiki
-if (!defined('DOKU_INC')) {
-    die();
-}
-
-if (!defined('DOKU_PLUGIN')) {
-    define('DOKU_PLUGIN', DOKU_INC.'lib/plugins/');
-}
-require_once(DOKU_PLUGIN.'action.php');
-include_once(DOKU_PLUGIN.'cite/code.php');
+include_once(DOKU_PLUGIN . 'cite/code.php'); //this ensures the functions in code.php are always available
 
 class action_plugin_cite extends DokuWiki_Action_Plugin
 {
     /**
      * register the eventhandlers
+     *
+     * @param Doku_Event_Handler $controller
      */
-    public function register(Doku_Event_Handler $contr)
+    public function register(Doku_Event_Handler $controller)
     {
-        $contr->register_hook('ACTION_ACT_PREPROCESS', 'BEFORE', $this, '_handle_act', array());
-        $contr->register_hook('TPL_ACT_UNKNOWN', 'BEFORE', $this, '_handle_tpl_act', array());
+        $controller->register_hook('ACTION_ACT_PREPROCESS', 'BEFORE', $this, '_handle_act', array());
+        $controller->register_hook('TPL_ACT_UNKNOWN', 'BEFORE', $this, '_handle_tpl_act', array());
+        $controller->register_hook('MENU_ITEMS_ASSEMBLY', 'AFTER', $this, 'addsvgbutton', array());
+
     }
 
-    public function _handle_act(&$event, $param)
+    public function _handle_act($event, $param)
     {
         if ($event->data != 'cite') {
             return;
@@ -34,142 +29,183 @@ class action_plugin_cite extends DokuWiki_Action_Plugin
         $event->preventDefault();
     }
 
-    public function _handle_tpl_act(&$event, $param)
+    public function _handle_tpl_act($event, $param)
     {
         if ($event->data != 'cite') {
             return;
         }
         $event->preventDefault();
 
-        global $INFO, $conf, $ID;
+        global $conf, $ID, $REV, $INFO;
 
-        $cite_perm = cite_getPermURL();
-        $cite_author = $this->getConf('cite_author');
-        $cite_publisher = $this->getConf('cite_publisher');
-
-        if ($cite_author == '') {
-            $cite_author = 'Anonymous Contributors';
+        //get always a revision id
+        $revisionId = $REV; //$REV includes converted DATE_AT as well
+        if (!$revisionId) {
+            $revisionId = $INFO['lastmod'];
         }
-        if ($cite_publisher == '') {
-            $cite_publisher = hsc($conf['title']);
-        } ?>
-<h1><a name="bibliographic_details" id="bibliographic_details">Bibliographic details for &quot;<?php tpl_pagetitle()?>&quot;</a></h2>
+
+        $pagename = tpl_pagetitle($ID, true);
+        $permanentUrl = wl($ID, ['rev' => $revisionId], true);
+        $author = $this->getConf('cite_author');
+        if ($author == '') {
+            $author = 'Anonymous Contributors';
+        }
+        $publisher = $this->getConf('cite_publisher');
+        if ($publisher == '') {
+            $publisher = hsc($conf['title']);
+        }
+
+        $revisionDateSummary = date('j F Y H:i T', $revisionId);
+        $revisionDateYear = date('Y', $revisionId);
+        $revisionDateMLA = date('j M Y, H:i T', $revisionId);
+        $revisionDateMHRA = date('j F Y, H:i T', $revisionId);
+        $revisionDateCBECSE = date('Y M j, H:i T', $revisionId);
+        $revisionDateAMA = date('F j, Y, H:i T', $revisionId);
+
+        $retrieveDateSummary = date('j F Y H:i T');
+        $retrieveDateAPA = date('H:i, j F, Y');
+        $retrieveDateMLA = date('j M Y, H:i');
+        $retrieveDateMHRA = date('j F Y');
+        $retrieveDateChicago = date('F j, Y');
+        $retrieveDateCBECSE = date('Y M j');
+        $retrieveDateBluebook = date('F j, Y');
+        $retrieveDataAMA = date('F j, Y');
+        $retrieveDataBibTeX = date('j-F-Y');
+
+
+        echo <<< EOT
+<h1><a id="bibliographic_details">Bibliographic details for "$pagename"</a></h2>
 <div class="level2">
 
-<ul>
-<li class="level1"><div class="li"> Page name: <?php tpl_pagetitle()?></div>
-</li>
-<li class="level1"><div class="li"> Author: <?php echo $cite_author; ?></div>
-</li>
-<li class="level1"><div class="li"> Publisher: <?php echo $cite_publisher?>.</div>
-</li>
-<li class="level1"><div class="li"> Date of this revision: <?php echo date('j F Y H:i T', $_REQUEST['rev']); ?></div>
-</li>
-<li class="level1"><div class="li"> Date retrieved: <?php echo date('j F Y H:i T'); ?></div>
-</li>
-<li class="level1"><div class="li"> Permanent link: <a href="<?php echo $cite_perm; ?>" title="<?php echo $cite_perm; ?>"><?php echo $cite_perm; ?></a></div>
-</li>
-<li class="level1"><div class="li"> Page Version ID: <?php echo $_REQUEST['rev']; ?> </div>
+    <ul>
+        <li class="level1"><div class="li"> Page name: $pagename</div></li>
+        <li class="level1"><div class="li"> Author: $author</div></li>
+        <li class="level1"><div class="li"> Publisher: $publisher.</div></li>
+        <li class="level1"><div class="li"> Date of this revision: $revisionDateSummary</div></li>
+        <li class="level1"><div class="li"> Date retrieved: $retrieveDateSummary</div></li>
+        <li class="level1"><div class="li"> Permanent link: <a href="$permanentUrl" title="$permanentUrl">$permanentUrl</a></div></li>
+        <li class="level1"><div class="li"> Page Version ID: $revisionId</div></li>
+    </ul>
 
-</li>
-</ul>
-
-<p>
- Please remember to check with your standards guide or professor&rsquo;s guidelines for the exact syntax to suit your needs.
-</p>
+    <p>
+     Please remember to check with your standards guide or professor&rsquo;s guidelines for the exact syntax to suit your needs.
+    </p>
 
 </div>
-<h2><a name="citation_styles_for" id="citation_styles_for">Citation styles for &quot;<?php tpl_pagetitle()?>&quot;</a></h2>
+<h2><a id="citation_styles_for">Citation styles for "$pagename"</a></h2>
 <div class="level2">
 
 </div>
 
-<h3><a name="apa_style" id="apa_style">APA style</a></h3>
+<h3><a id="apa_style">APA style</a></h3>
 <div class="level3">
 
-<p>
- <?php echo $cite_author; ?> (<?php echo date('Y', $_REQUEST['rev']); ?>). <?php tpl_pagetitle()?>. <?php echo $cite_publisher?>. Retrieved <?php echo date('H:i, j F, Y'); ?> from <a href="<?php echo $cite_perm; ?>" title="<?php echo $cite_perm; ?>"><?php echo $cite_perm; ?></a>.
-</p>
+    <p>
+    $author ($revisionDateYear). $pagename. $publisher. Retrieved $retrieveDateAPA from <a href="$permanentUrl" title="$permanentUrl">$permanentUrl</a>.
+    </p>
 
 </div>
-<h3><a name="mla_style" id="mla_style">MLA style</a></h3>
-
-<div class="level3">
-
-<p>
- &ldquo;<?php tpl_pagetitle()?>.&rdquo; <u><?php echo $cite_publisher?></u>. <?php echo date('j M Y, H:i T', $_REQUEST['rev']); ?>. <?php echo date('j M Y, H:i'); ?> &lt;<a href="<?php echo $cite_perm; ?>" title="<?php echo $cite_perm; ?>"><?php echo $cite_perm; ?></a>&gt;.
-</p>
-
-</div>
-<h3><a name="mhra_style" id="mhra_style">MHRA style</a></h3>
-<div class="level3">
-
-<p>
- <?php echo $cite_author; ?>, &lsquo;<?php tpl_pagetitle()?>&rsquo;, <?php echo $cite_publisher?>, <?php echo date('j F Y, H:i T', $_REQUEST['rev']); ?>, &lt;<a href="<?php echo $cite_perm; ?>" title="<?php echo $cite_perm; ?>"><?php echo $cite_perm; ?></a>&gt; [accessed <?php echo date('j F Y'); ?>]
-</p>
-
-</div>
-<h3><a name="chicago_style" id="chicago_style">Chicago style</a></h3>
-<div class="level3">
-
-<p>
- <?php echo $cite_author; ?>, &ldquo;<?php tpl_pagetitle()?>,&rdquo; <?php echo $cite_publisher?>, <a href="<?php echo $cite_perm; ?>" title="<?php echo $cite_perm; ?>"><?php echo $cite_perm; ?></a> (accessed <?php echo date('F j, Y'); ?>).
-</p>
-
-</div>
-<h3><a name="cbe_cse_style" id="cbe_cse_style">CBE/CSE style</a></h3>
+<h3><a id="mla_style">MLA style</a></h3>
 
 <div class="level3">
 
-<p>
- <?php echo $cite_author; ?>. <?php tpl_pagetitle()?> [Internet]. <?php echo $cite_publisher?>; <?php echo date('Y M j, H:i T', $_REQUEST['rev']); ?> [cited <?php echo date('Y M j'); ?>]. Available from: <a href="<?php echo $cite_perm; ?>" title="<?php echo $cite_perm; ?>"><?php echo $cite_perm; ?></a>.
-</p>
+    <p>
+     &ldquo;$pagename.&rdquo; <u>$publisher</u>. $revisionDateMLA. $retrieveDateMLA &lt;<a href="$permanentUrl" title="$permanentUrl">$permanentUrl</a>&gt;.
+    </p>
 
 </div>
-<h3><a name="bluebook_style" id="bluebook_style">Bluebook style</a></h3>
+<h3><a id="mhra_style">MHRA style</a></h3>
 <div class="level3">
 
-<p>
-
- <?php tpl_pagetitle()?>, <a href="<?php echo $cite_perm; ?>" title="<?php echo $cite_perm; ?>"><?php echo $cite_perm; ?></a> (last visited <?php echo date('F j, Y'); ?>).
-</p>
+    <p>
+     $author, &lsquo;$pagename&rsquo;, $publisher, $revisionDateMHRA, &lt;<a href="$permanentUrl" title="$permanentUrl">$permanentUrl</a>&gt;
+     [accessed $retrieveDateMHRA]
+    </p>
 
 </div>
-<h3><a name="ama_style" id="ama_style">AMA style</a></h3>
+<h3><a id="chicago_style">Chicago style</a></h3>
 <div class="level3">
 
-<p>
- <?php echo $cite_author; ?>. <?php tpl_pagetitle()?>. <?php echo $cite_publisher?>. <?php echo date('F j, Y, H:i T', $_REQUEST['rev']); ?>. Available at: <a href="<?php echo $cite_perm; ?>" title="<?php echo $cite_perm; ?>"><?php echo $cite_perm; ?></a>. Accessed <?php echo date('F j, Y'); ?>.
-
-</p>
+    <p>
+     $author, &ldquo;$pagename,&rdquo; $publisher, <a href="$permanentUrl" title="$permanentUrl">$permanentUrl</a>
+     (accessed $retrieveDateChicago).
+    </p>
 
 </div>
-<h3><a name="bibtex_entry" id="bibtex_entry">BibTeX entry</a></h3>
+<h3><a id="cbe_cse_style">CBE/CSE style</a></h3>
+
+<div class="level3">
+
+    <p>
+     $author. $pagename [Internet]. $publisher; $revisionDateCBECSE [cited $retrieveDateCBECSE].
+     Available from: <a href="$permanentUrl" title="$permanentUrl">$permanentUrl</a>.
+    </p>
+
+</div>
+<h3><a id="bluebook_style">Bluebook style</a></h3>
+<div class="level3">
+
+    <p>
+
+     $pagename, <a href="$permanentUrl" title="$permanentUrl">$permanentUrl</a> (last visited $retrieveDateBluebook).
+    </p>
+
+</div>
+<h3><a id="ama_style">AMA style</a></h3>
+<div class="level3">
+
+    <p>
+     $author. $pagename. $publisher. $revisionDateAMA. Available at:
+     <a href="$permanentUrl" title="$permanentUrl">$permanentUrl</a>. Accessed $retrieveDataAMA.
+    </p>
+
+</div>
+<h3><a id="bibtex_entry">BibTeX entry</a></h3>
 <div class="level3">
 <pre>
  @misc{ wiki:xxx,
-   author = &quot;<?php echo $cite_author; ?>&quot;,
-   title = &quot;<?php tpl_pagetitle()?> --- <?php echo $cite_publisher?>&quot;,
-   year = &quot;<?php echo date('Y', $_REQUEST['rev']); ?>&quot;,
-   url = &quot;<?php echo $cite_perm; ?>&quot;,
-   note = &quot;[Online; accessed <?php echo date('j-F-Y'); ?>]&quot;
+   author = "$author",
+   title = "$pagename --- $publisher",
+   year = "$revisionDateYear",
+   url = "$permanentUrl",
+   note = "[Online; accessed $retrieveDataBibTeX]"
  }
 </pre>
 
-<p>
-When using the LaTeX package url (\usepackage{url} somewhere in the preamble), which tends to give much more nicely formatted web addresses, the following may be preferred:
-</p>
+    <p>
+    When using the LaTeX package url (<code>\usepackage{url}</code> somewhere in the preamble), which tends to give much more nicely
+    formatted web addresses, the following may be preferred:
+    </p>
 <pre>
  @misc{ wiki:xxx,
-   author = &quot;<?php echo $cite_author; ?>&quot;,
-   title = &quot;<?php tpl_pagetitle()?> --- <?php echo $cite_publisher?>&quot;,
-   year = &quot;<?php echo date('Y', $_REQUEST['rev']); ?>&quot;,
-   url = &quot;\url{<?php echo $cite_perm; ?>}&quot;,
-   note = &quot;[Online; accessed <?php echo date('j-F-Y'); ?>]&quot;
+   author = "$author",
+   title = "$pagename --- $publisher",
+   year = "$revisionDateYear",
+   url = "\url{{$permanentUrl}}",
+   note = "[Online; accessed $retrieveDataBibTeX]"
  }
 </pre>
 
 </div>
-<?php
+EOT;
+    }
+
+    /**
+     * Add 'cite' button to page tools, new SVG based mechanism
+     *
+     * @param Doku_Event $event
+     */
+    public function addsvgbutton(Doku_Event $event)
+    {
+        global $INFO;
+        if ($event->data['view'] != 'page' || !$this->getConf('showcitebutton')) {
+            return;
+        }
+
+        if (!$INFO['exists']) {
+            return;
+        }
+
+        array_splice($event->data['items'], -1, 0, [new \dokuwiki\plugin\cite\MenuItem()]);
     }
 }

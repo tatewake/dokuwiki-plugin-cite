@@ -4,34 +4,38 @@
 
 This plugin gives you the ability to let users cite your work. This is required quite often in academia and journalism.
 
-The way this is done is by appending "&do=cite" to a wiki page's URL in addition to an optional revision number, for example "rev=123456789".
+The way to show the page with the different citations styles is by appending ''&do=cite'' to a wiki page's URL in addition to an optional revision number, for example ''rev=123456789''.
 
-**Note:** Some templates may be "citation aware", but otherwise you will need to add code to your template's **main.php** for the citation links to appear!
+Recent templates can add the button to the citations automatically to their menu. In the Configuration Manager you can disable it again.
+Otherwise you will need to add code to your template's **main.php** for the citation links to appear!
 
-===== Setup =====
-
-In **main.php**, add the following at the top of the file:
-<code php><?php if (file_exists(DOKU_PLUGIN.'cite/code.php')) include_once(DOKU_PLUGIN.'cite/code.php'); ?></code>
+===== Setup if not yet supported =====
 
 To display a permanent link or citation link at any point in your document, use the following code as an example:
-<code php><?php if (function_exists('cite_getPermURL')) { ?><a href="<?php echo cite_getPermURL(); ?>" rel="nofollow">Permanent Link</a><?php } ?>
-<?php if (function_exists('cite_getCiteURL')) { ?><a href="<?php echo cite_getCiteURL(); ?>" rel="nofollow">Cite this Page</a><?php } ?></code>
+<code php>
+<?php if (function_exists('cite_getPermURL')) { ?><a href="<?php echo cite_getPermURL(); ?>" rel="nofollow">Permanent Link</a><?php } ?>
+<?php if (function_exists('cite_getCiteURL')) { ?><a href="<?php echo cite_getCiteURL(); ?>" rel="nofollow">Cite this Page</a><?php } ?>
+</code>
 
 My advice is to keep the ''%%rel="nofollow"%%'' intact as this ensures search engines don't index citations.
 
 Set the options for this plugin via the **Configuration Settings** menu from the DokuWiki admin menu. (It will be near the bottom of the page.)
 
 ===== For template developers =====
+====Current menus====
+If you use the [[https://www.dokuwiki.org/devel:menus]], the button to the citation page is added automatically to the page tools.
+These menu icons are svg-based, so icons can be colored in the style of the template.
 
+====Old menus====
 The plugin also exports two functions for use with your template:
 
-  * **cite_getPermURL** : A //permanent link// to a page revision
-  * **cite_getCiteURL** : A //citation link// so that you can let others easily cite your work
+  * **cite_getPermURL()** : A //permanent link// to a page revision
+  * **cite_getCiteURL()** : A //citation link// so that you can let others easily cite your work
 
 Please feel free to use those functions if you intend to make your template "citation aware".
 
 ===== Support =====
 
-For further support or discussion, please see the official plugin page [[doku>plugin:cite|here]].
+For further support or discussion, please see the official [[doku>plugin:cite|plugin]] page.
 
 If you find this plugin useful, please consider supporting the project via [[http://tjgrant.com/wiki/donate|Donations]] or [[https://github.com/sponsors/tatewake|Sponsorships]]; thank you!

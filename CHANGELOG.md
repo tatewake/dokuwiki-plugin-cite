@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Added svg-based menu entry, with config setting to disable it
 ### Changed
+- cite_getPermURL() and cite_getCiteURL() changed internally to prevent overwritting the global rev entry
 ### Removed
 ### Fixed
 
@@ -17,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [CITE-3] - Added LICENSE, README.md, CHANGELOG.md, admin page, admin svg icon, and some code cleanup
 
-## 
+##
 
 [1.0.0]: https://github.com/tatewake/dokuwiki-plugin-cite/releases/tag/1.0.0
 
