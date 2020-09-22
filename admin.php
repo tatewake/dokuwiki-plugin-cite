@@ -12,10 +12,6 @@ class admin_plugin_cite extends DokuWiki_Admin_Plugin
     /** @inheritdoc */
     public function handle()
     {
-        global $INPUT;
-        if ($INPUT->post->has('pref') && checkSecurityToken()) {
-            $this->savePreferences($INPUT->post->arr('pref'));
-        }
     }
 
     /**
@@ -23,8 +19,6 @@ class admin_plugin_cite extends DokuWiki_Admin_Plugin
      */
     public function html()
     {
-        global $INPUT;
-
         echo '<div class="plugin_cite">';
 
         echo $this->locale_xhtml('intro');

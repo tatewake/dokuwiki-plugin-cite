@@ -4,7 +4,7 @@
 
 * **Author**: [Terence J. Grant](mailto:tjgrant@tatewake.com)
 * **License**: [GNU GPL v2](http://opensource.org/licenses/GPL-2.0)
-* **Latest Release**: v1.0.0 on Sep 14th, 2020
+* **Latest Release**: v1.1.0 on Sep 22nd, 2020
 * **Changes**: See [CHANGELOG.md](CHANGELOG.md) for full details.
 * **Donate**: [Donations](http://tjgrant.com/wiki/donate) and [Sponsorships](https://github.com/sponsors/tatewake) are appreciated!
 
